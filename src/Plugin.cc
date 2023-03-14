@@ -122,15 +122,22 @@ void Plugin::Load(const tinyxml2::XMLElement *_pluginElem)
 
   // This let's <filename>.qml use <pluginclass> functions and properties
   this->dataPtr->context = new QQmlContext(App()->Engine()->rootContext());
-  this->dataPtr->context->setContextProperty(QString::fromStdString(filename),
+  this->dataPtr->context->setContextProperty(QString::fromStdString(filename) ,
       this);
+  this->dataPtr->context->setContextProperty(
+      QString::fromStdString(filename) + "Plugin", this);
 
   // Instantiate plugin QML file into a component
-  std::string qmlFile(":/" + filename + "/" + filename + ".qml");
+  std::string qmlFile = ":/" + filename + "/" + filename + ".qml";
+  if(_pluginElem->Attribute("qml") != nullptr)
+  {
+    qmlFile = _pluginElem->Attribute("qml");
+
+  }
   if (!QFile(QString::fromStdString(qmlFile)).exists())
   {
     ignerr << "Can't find [" << qmlFile
-           << "]. Are you sure it was added to the .qrc file?" << std::endl;
+      << "]. Are you sure it was added to the .qrc file?" << std::endl;
     return;
   }
 
