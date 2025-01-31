@@ -40,6 +40,12 @@
 
 namespace gz::gui
 {
+
+void QmlHelper::setItemValue(QObject * _item, QVariant _value)
+{
+  _item->setProperty("value", _value);
+}
+
 class Application::Implementation
 {
   /// \brief QML engine
@@ -74,6 +80,8 @@ class Application::Implementation
   public: std::string defaultConfigPath;
 
   public: common::SignalHandler signalHandler;
+
+  public: QmlHelper qmlHelper;
 
   /// \brief QT message handler that pipes qt messages into our console
   /// system.
@@ -237,6 +245,10 @@ Application::Application(int &_argc, char **_argv, const WindowType _type,
   {
     gzerr << "Unknown WindowType [" << static_cast<int>(_type) << "]\n";
   }
+
+  // Load helper C++ class for use anywhere
+  this->dataPtr->engine->rootContext()->setContextProperty(
+      "qmlHelper", &this->dataPtr->qmlHelper);
 }
 
 /////////////////////////////////////////////////

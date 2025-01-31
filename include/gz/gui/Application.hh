@@ -18,6 +18,8 @@
 #define GZ_GUI_APPLICATION_HH_
 
 #include <memory>
+#include <qobject.h>
+#include <qvariant.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -38,6 +40,12 @@ namespace gz::gui
     class MainWindow;
     class Plugin;
 
+
+    struct QmlHelper: public QObject {
+      Q_OBJECT
+
+      public: Q_INVOKABLE void setItemValue(QObject * _item, QVariant _value);
+    };
     /// \brief Type of window which the application will display
     enum class WindowType : int
     {

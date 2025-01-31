@@ -17,57 +17,96 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.15
 
-Control {
+Item {
   id: root
-  signal editingFinished(real _value)
-  property alias minimumValue: spinBox.minimumValue
-  property alias maximumValue: spinBox.maximumValue
-  property alias value: spinBox.value
+  signal editingFinished
+  property real minimumValue: 0
+  property real maximumValue: 100
+  property real value: 0.0
   property real stepSize: 1.0
-  property alias decimals: spinBox.decimals
-  anchors.fill : parent
+  property int decimals: 0
 
+  property bool __enableUpdateFromSpinbox: true
+  onValueChanged: {
+    root.__enableUpdateFromSpinbox = false
+    spinBox.value = decimalToInt(root.value)
+    root.__enableUpdateFromSpinbox = true
+  }
+  //implicitWidth: spinBox.implicitWidth
+  implicitHeight: spinBox.implicitHeight
+
+  readonly property int kMaxInt: Math.pow(2, 31) - 1
 
   function decimalToInt(decimal) {
-    return decimal * spinBox.decimalFactor
+    var result = decimal * spinBox.decimalFactor
+    if (result >= kMaxInt) {
+      return kMaxInt
+    }
+    return result
   }
+
+  function intToDecimal(intVal) {
+    return intVal / spinBox.decimalFactor
+  }
+
   SpinBox {
       id: spinBox
-      value: decimalToInt(1.1)
-  anchors.fill : parent
 
-      property real minimumValue: 0
-      property real maximumValue: 100
+      anchors.fill : parent
+      bottomPadding: 0
+      topPadding: 0
+      implicitHeight: 40
+      clip: true
+
+      value: 0
+
+      onValueChanged: {
+        if (root.__enableUpdateFromSpinbox) {
+          qmlHelper.setItemValue(root, intToDecimal(value));
+          root.editingFinished()
+        }
+      }
 
       from: decimalToInt(minimumValue)
-      to: decimalToInt(maximumValue)
+      to: decimalToInt(root.maximumValue)
 
       stepSize: decimalToInt(root.stepSize)
       editable: true
       anchors.centerIn: parent
 
-      signal editingFinished(real _value)
+      readonly property real decimalFactor: Math.pow(10, root.decimals)
 
-      property int decimals: 2
-      property real realValue: value / decimalFactor
-      readonly property int decimalFactor: Math.pow(10, decimals)
+      contentItem: TextInput {
+        font.pointSize: 10
+        text: spinBox.textFromValue(spinBox.value, spinBox.locale)
+        horizontalAlignment: Qt.AlignHCenter
+        verticalAlignment: Qt.AlignVCenter
+        readOnly: !spinBox.editable
+        validator: spinBox.validator
+        inputMethodHints: Qt.ImhFormattedNumbersOnly
+        selectByMouse: true
+      }
 
       validator: DoubleValidator {
           bottom: Math.min(spinBox.from, spinBox.to)
           top:  Math.max(spinBox.from, spinBox.to)
-          decimals: spinBox.decimals
+          decimals: root.decimals
           notation: DoubleValidator.StandardNotation
       }
 
       textFromValue: function(value, locale) {
-          return Number(value / decimalFactor).toLocaleString(locale, 'f', spinBox.decimals)
+          return intToDecimal(value).toLocaleString(locale, 'f', parent.decimals)
       }
 
       valueFromText: function(text, locale) {
-          return Math.round(Number.fromLocaleString(locale, text) * decimalFactor)
+          return Math.round(decimalToInt(Number.fromLocaleString(locale, text)))
       }
-      // onValueChanged: function(_value) {
-      //   editingFinished(_value)
-      // }
+
+      background: Rectangle {
+        implicitWidth: 70
+        implicitHeight: parent.implicitHeight
+        border.color: "gray"
+      }
   }
 }
+

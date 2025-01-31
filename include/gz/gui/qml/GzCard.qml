@@ -162,12 +162,12 @@ Pane {
   contentHeight: content.implicitHeight
 
   // Stop scroll propagation to widgets below
-  MouseArea {
-    anchors.fill: parent
-    onWheel: {
-      wheel.accepted = true
-    }
-  }
+  //MouseArea {
+  //  anchors.fill: parent
+  //  onWheel: {
+  //    wheel.accepted = true
+  //  }
+  //}
 
 
   GzHelpers {
@@ -447,15 +447,15 @@ Pane {
   }
 
   // For context menu
-  MouseArea {
-    anchors.fill: content
-    acceptedButtons: Qt.RightButton
-    onClicked: {
-      contextMenu.x = mouseX
-      contextMenu.y = mouseY
-      contextMenu.open()
-    }
-  }
+  //MouseArea {
+  //  anchors.fill: content
+  //  acceptedButtons: Qt.RightButton
+  //  onClicked: {
+  //    contextMenu.x = mouseX
+  //    contextMenu.y = mouseY
+  //    contextMenu.open()
+  //  }
+  //}
 
   Menu {
     id: contextMenu
@@ -519,10 +519,10 @@ Pane {
     }
   }
 
-  GzRulers {
-    anchors.fill: parent
-    enabled: cardPane.state === "floating" && resizable
-    minSize: cardPane.minSize
-    target: cardPane
-  }
+  //GzRulers {
+  //  anchors.fill: parent
+  //  enabled: cardPane.state === "floating" && resizable
+  //  minSize: cardPane.minSize
+  //  target: cardPane
+  //}
 }

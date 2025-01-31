@@ -177,26 +177,26 @@ GridLayout {
     font.bold: true
   }
 
-  GzPose {
-    id: gzPoseInstance
-    Layout.columnSpan: 4
-    Layout.fillWidth: true
-    readOnly: false
-    xValue: 0.00
-    yValue: 0.00
-    zValue: 0.00
-    rollValue: 0.00
-    pitchValue: 0.00
-    yawValue: 0.00
-
-    onGzPoseSet: {
-      // _x, _y, _z, _roll, _pitch, _yaw are parameters of signal gzPoseSet
-      // from gz-gui GzPose.qml
-      GridConfig.SetPose(_x, _y, _z, _roll, _pitch, _yaw)
-    }
-    expand: true
-    gzPlotEnabled: false
-  }
+  //GzPose {
+  //  id: gzPoseInstance
+  //  Layout.columnSpan: 4
+  //  Layout.fillWidth: true
+  //  readOnly: false
+  //  xValue: 0.00
+  //  yValue: 0.00
+  //  zValue: 0.00
+  //  rollValue: 0.00
+  //  pitchValue: 0.00
+  //  yawValue: 0.00
+  //
+  //  onGzPoseSet: {
+  //    // _x, _y, _z, _roll, _pitch, _yaw are parameters of signal gzPoseSet
+  //    // from gz-gui GzPose.qml
+  //    GridConfig.SetPose(_x, _y, _z, _roll, _pitch, _yaw)
+  //  }
+  //  expand: true
+  //  gzPlotEnabled: false
+  //}
 
   Text {
     Layout.columnSpan: 4
