@@ -45,6 +45,7 @@
 #include <gz/rendering/RenderEngine.hh>
 #include <gz/rendering/RenderingIface.hh>
 #include <gz/rendering/Scene.hh>
+#include <gz/rendering/Fog.hh>
 #include <gz/transport/Node.hh>
 #include <gz/transport/TopicUtils.hh>
 
@@ -489,6 +490,53 @@ void TransportSceneManager::Implementation::LoadScene(const msgs::Scene &_msg)
       else
         gzerr << "Failed to load light: " << _msg.light(i).name() << std::endl;
     }
+  }
+
+  // Load and apply scene-wide fog
+  gzdbg << "GUI TransportSceneManager::LoadScene processing scene message." << std::endl;
+  if (_msg.has_fog())
+  {
+    const msgs::Fog &fogMsg = _msg.fog();
+    gzdbg << "GUI TransportSceneManager::LoadScene found fog in message: type=" << fogMsg.type()
+          << ", color=" << fogMsg.color().r() << " " << fogMsg.color().g() << " " << fogMsg.color().b()
+          << ", start=" << fogMsg.start() << ", end=" << fogMsg.end() << std::endl;
+    if (fogMsg.type() != msgs::Fog::NONE)
+    {
+      if (this->scene->Extension())
+      {
+        auto fogExt = std::dynamic_pointer_cast<rendering::Fog>(
+            this->scene->Extension()->CreateExt("fog"));
+        if (fogExt)
+        {
+          gzdbg << "GUI TransportSceneManager::LoadScene successfully created Fog extension." << std::endl;
+          rendering::FogMode mode = rendering::FogMode::FOG_NONE;
+          if (fogMsg.type() == msgs::Fog::LINEAR)
+            mode = rendering::FogMode::FOG_LINEAR;
+          else if (fogMsg.type() == msgs::Fog::EXPONENTIAL)
+            mode = rendering::FogMode::FOG_EXP;
+          else if (fogMsg.type() == msgs::Fog::EXPONENTIAL2)
+            mode = rendering::FogMode::FOG_EXP2;
+
+          fogExt->SetMode(mode);
+          fogExt->SetColor(msgs::Convert(fogMsg.color()));
+          fogExt->SetDensity(fogMsg.density());
+          fogExt->SetStart(fogMsg.start());
+          fogExt->SetEnd(fogMsg.end());
+        }
+        else
+        {
+          gzerr << "GUI TransportSceneManager::LoadScene failed to create Fog extension object." << std::endl;
+        }
+      }
+      else
+      {
+        gzerr << "GUI TransportSceneManager::LoadScene scene extension interface is null." << std::endl;
+      }
+    }
+  }
+  else
+  {
+    gzdbg << "GUI TransportSceneManager::LoadScene scene message has no fog." << std::endl;
   }
 }
 
